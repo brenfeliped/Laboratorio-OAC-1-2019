@@ -1,1 +1,7 @@
 Respostas do lab1:
+
+1)
+
+    1.1)(0,0) Feita em sala
+
+    1.2)(1.0) t0(n) = I * 1 * 20000 PS tal  que para arquivo sort.s I= 76 + 32n, n sendo a quntidade de elementos no vetor, portanto  t0(n) = (76 + 32n) * 20000 ps, t0(n) sendo o tempo de execução para um vetor ordenado.

@@ -2,7 +2,7 @@
 .include "macros2.s"
 
 .data
-C: .word 10,10,10,20,5,30 # array de tuplas onde cada tupla representa uma posição na tela
+C: .word 10,10,40,20,60,30 # array de tuplas onde cada tupla representa uma posição na tela
 N: .word 6 #tamanho do array
 
 .text
@@ -14,21 +14,30 @@ TEST: #teste de verificação do plot na tela
   la a1, C #carrega o endereço de C em a1
 
 DESENHA:
-  lw s0, 0(a0) # salvando os valores de N(a0) e C(a1)
-  addi s1, a1, 0
+  addi sp, sp, -4
+  sw a0, 0(sp) # salvando os valores de N(a0) e C(a1) na pilha
+  sw a1, 4(sp)
   jal PLOTFRAME #constroi o plano de fundo
-  li a4, 0 # a4 
-  li a3, 0x2000 # 0x20 = cor verde do quadrado 0x00 = cor preta da letra
-  li a0, 0 #limpa os registradores a0 e a1
-  li a1, 0
-  li a7, 111 #mostra na tela o frame com o vertice inserido
-  addi a0, zero, 64 # carregando 64 em a0
   
-  jal PLOTPOINT
-  jal FIM
+  jal PLOTPOINT #desenha os vértices
+  jal PLOTLINES #desenha os arcos
+  
+  addi sp, sp, 4 #limpa a pilha novamente
+  
+  jal FIM #encerra o programa
   
   
 PLOTPOINT:
+  lw s1, 4(sp) #recarregando posiçoes s1(C) e s0(N)
+  lw t1, 0(sp)
+  lw s0, 0(t1) #recarrega o tamanho do vetor
+  li a4, 0 # a4 
+  li a3, 0x2000 # 0x20 = cor verde do quadrado 0x00 = cor preta da letra
+  li a1, 0 #limpa o registrador a1
+  li a7, 111 #mostra na tela o frame com o vertice inserido
+  addi a0, zero, 64 # carregando 64 em a0
+  
+FORPLOTPOINT:
   addi a0, a0, 1 # incrementando n+64
   
   lw a1, 0(s1) # posicao x de onde o char vai ser mostrado
@@ -38,9 +47,36 @@ PLOTPOINT:
   
   addi s0, s0, -2 # para cada iteração decrementa-se -2 das s0(N) tuplas
   addi s1, s1, 8 #incrementa a posicao da proxima tupla, palavra(word) de s1
-  bne zero, s0, PLOTPOINT #condicao de parada quando s0 for 0, ou seja, quando todos os vertices estiverem plotados
+  bne zero, s0, FORPLOTPOINT #condicao de parada quando s0 for 0, ou seja, quando todos os vertices estiverem plotados
   ret #retorna ao chamador
+
+PLOTLINES:
+  lw s1, 4(sp) #recarregando posiçoes s1(C) e s0(N)
+  lw t1, 0(sp)
+  lw s0, 0(t1) #recarrega o tamanho do vetor
   
+PLOTARCO:
+  lw a0,0(s1) #carregando parametros
+  lw a1,4(s1)
+  lw a2,8(s1)
+  lw a3,12(s1)
+  li a4, 0x0000 #cor do arco preto
+  li a5, 0 #frame 0
+  
+  jal BRESENHAM #chama o método para desenhar arcos
+  
+  addi s1, s1, 8 #próximas tuplas
+  addi s0, s0, -4
+  bge s0, zero, PLOTARCO #enquanto s0 >= 0 então volta a plotar arcos
+  
+  la s1, C #recarregando posiçoes s1(C)
+  lw a0,0(s1) #pega a primeira tupla(x,y)=(a0,a1)
+  lw a1,4(s1)
+  
+  jal BRESENHAM #printa um arco do primero ate o ultimo vertice
+  
+  ret #retorna ao chamador
+
 PLOTFRAME:
   li a0,0xFF000000  # endereco inicial da Memoria VGA
   li a1,0xFF012C00  # endereco final

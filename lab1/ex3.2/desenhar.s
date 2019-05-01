@@ -1,17 +1,13 @@
 
 .include "macros2.s"
 
-.data
-C: .word 10,10,40,20,60,30 # array de tuplas onde cada tupla representa uma posição na tela
-N: .word 6 #tamanho do array
-
-.text
+##############################
+#Metodo DESENHA
+#Dado um vetor de words contendo coordenadas(x,y) em C(a1) e o tamanho do vetor em N(a0)
+#Será printado um grafo no BitmapDisplay com as Coordenadas em C
+##############################
 
 M_SetEcall(exceptionHandling)	# Macro de SetEcall - não tem ainda na DE1-SoC
-
-TEST: #teste de verificação do plot na tela
-  la a0, N #carrega o endereço de N em a0
-  la a1, C #carrega o endereço de C em a1
 
 DESENHA:
   addi sp, sp, -4

@@ -1,6 +1,7 @@
-#######################################
+###############################################################################################
 ### Metodo SORTEIO recebe em a0  um N e a1 um vetor C, e criar na memoria N coordenadas (x,y)##
-### tal que 0 <=x <= 310 e 0 <- y <= 230####
+### tal que 0 <=x <= 310 e 0 <- y <= 230                                                     ##
+###############################################################################################
 .data
 N: .word 6
 # Número de Casas/Clientes
@@ -15,7 +16,7 @@ li a7,10 # chamada de fim de programa
 ecall
 
 SORTEIO:
-	li t0,1 # contador t0
+	li t0,0 # contador t0
 FOR:	beq t0,a0,ExitFor # if(t0==a0) : pc=ExitFor ? pc=pc+4
 	addi sp,sp,-4  # aloca espaco na pilha para guarda a0
 	sw  a0, 0(sp)  # coloca a0 na  pilha

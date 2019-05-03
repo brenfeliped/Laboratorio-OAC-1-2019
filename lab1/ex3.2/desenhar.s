@@ -1,13 +1,49 @@
 
 .include "macros2.s"
-
 ##############################
 #Metodo DESENHA
 #Dado um vetor de words contendo coordenadas(x,y) em C(a1) e o tamanho do vetor em N(a0)
-#Será printado um grafo no BitmapDisplay com as Coordenadas em C
+#Serï¿½ printado um grafo no BitmapDisplay com as Coordenadas em C
 ##############################
+.data
+N: .word 6
+# NÃºmero de Casas/Clientes
+C: .space 160
+# EspaÃ§o em bytes correspondente a 2 coordenadas x 20 casas (mÃ¡x) x 4 bytes,
+.text
+M_SetEcall(exceptionHandling)	# Macro de SetEcall - nï¿½o tem ainda na DE1-SoC
+la t0,N
+lw a0,0(t0)
+la a1,C
+jal ra,SORTEIO
+la a0,N
+la a1,C
+jal ra, DESENHA
+li a7,10 # chamada de fim de programa 
+ecall
 
-M_SetEcall(exceptionHandling)	# Macro de SetEcall - não tem ainda na DE1-SoC
+SORTEIO:
+  li t0,0 # contador t0
+FOR:	beq t0,a0,ExitFor # if(t0==a0) : pc=ExitFor ? pc=pc+4
+  addi sp,sp,-4  # aloca espaco na pilha para guarda a0
+  sw  a0, 0(sp)  # coloca a0 na  pilha
+  li a7,41       # chamada rand
+  ecall
+  li t1,311
+  remu t2,a0,t1 # t2 recebe um numero aleatorio entre 0 e 310 (coordenada x)
+  ecall
+  li t1,231
+  remu t3,a0,t1 # t3 recebe um numero aleatorio entre 0 e 230 (coordenada y)
+  sw t2,0(a1)    # carrega na memoria t1(coordenada x), no vetor C
+  addi a1,a1,4 # incrementa o endereco no vetor C
+  sw t3,0(a1)
+  addi a1,a1,4 # incrementa o endereco no vetor C
+  lw a0,0(sp) # recupera a0(N) da memoria
+  addi sp,sp,4 #  deslaca da pilha
+  addi t0,t0,1 # incrementa o contador t0
+  j FOR
+ExitFor:
+  jr ra     
 
 DESENHA:
   addi sp, sp, -4
@@ -15,7 +51,7 @@ DESENHA:
   sw a1, 4(sp)
   jal PLOTFRAME #constroi o plano de fundo
   
-  jal PLOTPOINT #desenha os vértices
+  jal PLOTPOINT #desenha os vï¿½rtices
   jal PLOTLINES #desenha os arcos
   
   addi sp, sp, 4 #limpa a pilha novamente
@@ -24,7 +60,7 @@ DESENHA:
   
   
 PLOTPOINT:
-  lw s1, 4(sp) #recarregando posiçoes s1(C) e s0(N)
+  lw s1, 4(sp) #recarregando posiï¿½oes s1(C) e s0(N)
   lw t1, 0(sp)
   lw s0, 0(t1) #recarrega o tamanho do vetor
   li a4, 0 # a4 
@@ -39,15 +75,15 @@ FORPLOTPOINT:
   lw a1, 0(s1) # posicao x de onde o char vai ser mostrado
   lw a2, 4(s1) # posicao y de onde o char vai ser mostrado
   
-  M_Ecall #chamada para o plot do vértice
+  M_Ecall #chamada para o plot do vï¿½rtice
   
-  addi s0, s0, -2 # para cada iteração decrementa-se -2 das s0(N) tuplas
+  addi s0, s0, -1 # para cada iteraï¿½ï¿½o decrementa-se -2 das s0(N) tuplas
   addi s1, s1, 8 #incrementa a posicao da proxima tupla, palavra(word) de s1
   bne zero, s0, FORPLOTPOINT #condicao de parada quando s0 for 0, ou seja, quando todos os vertices estiverem plotados
   ret #retorna ao chamador
 
 PLOTLINES:
-  lw s1, 4(sp) #recarregando posiçoes s1(C) e s0(N)
+  lw s1, 4(sp) #recarregando posiï¿½oes s1(C) e s0(N)
   lw t1, 0(sp)
   lw s0, 0(t1) #recarrega o tamanho do vetor
   
@@ -59,13 +95,13 @@ PLOTARCO:
   li a4, 0x0000 #cor do arco preto
   li a5, 0 #frame 0
   
-  jal BRESENHAM #chama o método para desenhar arcos
+  jal BRESENHAM #chama o mï¿½todo para desenhar arcos
   
-  addi s1, s1, 8 #próximas tuplas
+  addi s1, s1, 8 #prï¿½ximas tuplas
   addi s0, s0, -4
-  bge s0, zero, PLOTARCO #enquanto s0 >= 0 então volta a plotar arcos
+  bge s0, zero, PLOTARCO #enquanto s0 >= 0 entï¿½o volta a plotar arcos
   
-  la s1, C #recarregando posiçoes s1(C)
+  la s1, C #recarregando posiï¿½oes s1(C)
   lw a0,0(s1) #pega a primeira tupla(x,y)=(a0,a1)
   lw a1,4(s1)
   
@@ -78,13 +114,13 @@ PLOTFRAME:
   li a1,0xFF012C00  # endereco final
   li a2,0xFFFFFFFF  #cor do plano de fundo
 PLOT:    
-  sw a2, 0(a0) #escreve a cor na memória
-  addi a0, a0, 4 #incrementa 4 ao endereço
-  bne a0,a1,PLOT #Se não for o último endereço então continua o loop
-  ret #caso contrário retorna para o chamador
+  sw a2, 0(a0) #escreve a cor na memï¿½ria
+  addi a0, a0, 4 #incrementa 4 ao endereï¿½o
+  bne a0,a1,PLOT #Se nï¿½o for o ï¿½ltimo endereï¿½o entï¿½o continua o loop
+  ret #caso contrï¿½rio retorna para o chamador
   
 FIM:
-  li a7, 10 #encerra a execução do algoritmo
+  li a7, 10 #encerra a execuï¿½ï¿½o do algoritmo
   M_Ecall
   
 .include "SYSTEMv13.s"

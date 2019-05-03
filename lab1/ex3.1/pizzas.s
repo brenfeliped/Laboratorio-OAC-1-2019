@@ -1,3 +1,6 @@
+#######################################
+### Metodo SORTEIO recebe em a0  um N e a1 um vetor C, e criar na memoria N coordenadas (x,y)##
+### tal que 0 <=x <= 310 e 0 <- y <= 230####
 .data
 N: .word 6
 # Número de Casas/Clientes

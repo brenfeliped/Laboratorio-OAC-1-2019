@@ -1,7 +1,7 @@
-.eqv N 10
+.eqv N 2
 
 .data
-vetor:  .word 5,8,3,4,7,6,8,0,1,9
+vetor:  .word 10,5
 newl:	.string "\n"
 tab:	.string "\t"
 

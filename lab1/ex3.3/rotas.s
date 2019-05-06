@@ -6,7 +6,7 @@
 #Ser� printado um grafo no BitmapDisplay com as Coordenadas em C
 ##############################
 .data
-N: .word 20
+N: .word 6
 # Número de Casas/Clientes
 C: .space 160
 # Espaço em bytes correspondente a 2 coordenadas x 20 casas (máx) x 4 bytes,
@@ -52,6 +52,7 @@ DESENHA:
   jal PLOTFRAME #constroi o plano de fundo
   
   jal PLOTPOINT #desenha os v�rtices
+  jal PLOTLINES #desenha os arcos
   
   addi sp, sp, 4 #limpa a pilha novamente
   
@@ -79,6 +80,33 @@ FORPLOTPOINT:
   addi s0, s0, -1 # para cada itera��o decrementa-se -2 das s0(N) tuplas
   addi s1, s1, 8 #incrementa a posicao da proxima tupla, palavra(word) de s1
   bne zero, s0, FORPLOTPOINT #condicao de parada quando s0 for 0, ou seja, quando todos os vertices estiverem plotados
+  ret #retorna ao chamador
+
+PLOTLINES:
+  lw s1, 4(sp) #recarregando posi�oes s1(C) e s0(N)
+  lw t1, 0(sp)
+  lw s0, 0(t1) #recarrega o tamanho do vetor
+  
+PLOTARCO:
+  lw a0,0(s1) #carregando parametros
+  lw a1,4(s1)
+  lw a2,8(s1)
+  lw a3,12(s1)
+  li a4, 0x0000 #cor do arco preto
+  li a5, 0 #frame 0
+  
+  jal BRESENHAM #chama o m�todo para desenhar arcos
+  
+  addi s1, s1, 8 #pr�ximas tuplas
+  addi s0, s0, -4
+  bge s0, zero, PLOTARCO #enquanto s0 >= 0 ent�o volta a plotar arcos
+  
+  la s1, C #recarregando posi�oes s1(C)
+  lw a0,0(s1) #pega a primeira tupla(x,y)=(a0,a1)
+  lw a1,4(s1)
+  
+  jal BRESENHAM #printa um arco do primero ate o ultimo vertice
+  
   ret #retorna ao chamador
 
 PLOTFRAME:

@@ -9,8 +9,7 @@ I = 76 + 32(n-1)
 
 Logo a equação que defini o tempo de execução de algoritmo , pode ser definida como:<br>
 
-<strong> Texec = 76 + 32(n-1)* 20000PS
-
+Texec = 76 + 32(n-1)* 20000PS
 
 Vetor Não-ordenado
 

@@ -1,0 +1,32 @@
+<h1>Exercício 1.2</h1>
+
+<h2> Vetor Ordenado </h2>
+
+<p>
+Temos abaixo a equação encontrada para o número de instruções que
+são executadas no algoritmo sort.s (Considerando 'n' como o tamanho o vetor):
+
+<strong> I = 76 + 32(n-1) </strong>
+</p>
+
+<p>
+Logo a equação que defini o tempo de execução de algoritmo , pode ser definida como:<br>
+
+<strong> Texec = 76 + 32(n-1)* 20000PS </strong>
+</p>
+
+<h2> Vetor Não-ordenado </h2>
+<p>
+A equação que defini o número de instruções é definida por:
+
+I[0] = 76 , I[1] = 121
+<strong> I[n] = ((2 * I[n-1] - I[n-2]) + 18) * 20000PS </strong>
+
+</p>
+
+<p>
+Levando em consideração que precisa-se definir as constantes iniciais como parâmetro,
+para o funcionamento da função iterativa acima , constantes essas que são os números de
+instruções para as duas primeiras instruções.
+
+</p>

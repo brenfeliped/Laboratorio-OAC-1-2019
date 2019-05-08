@@ -1,0 +1,14 @@
+sortc usando a diretiva -O0 possui 3200 instruções ao fim da execução do arquivo.
+sortc usando a diretiva -O1 possui 1193 instruções ao todo.(ordenado inversamente)
+sortc usando a diretiva -O2 possui  776 instruções.(ordenado inversamente)
+
+Percebe-se uma diferença muito grande em cada uma das otimizações , e comparando com o arquivo sort.s da primeira questão :
+
+*sortc.s(-O0) 3200 instruções com 10 elementos ; sort.s 1129 instruções com os elementos ordenados inversamente nos 2 arquivos.
+.
+.
+.
+e assim segue
+
+ 
+

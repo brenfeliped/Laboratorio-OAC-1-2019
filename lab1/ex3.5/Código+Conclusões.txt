@@ -1,0 +1,29 @@
+Código feito em R
+
+# Definindo os valores do gráfico
+N <- 2:20 #vetor N
+texec<- 1:19 #tempo de execução
+cpi<- 1#CPI
+Inst<- 40 #chute de instruções
+T <- 1 / 50 #período = 1/freq
+
+for(i in 0:18){ #calcula o tempo de execução para cada iteração
+  InstF = N[i+1]*Inst
+  texec[i] = cpi * InstF * T
+}
+
+# Graph cars using blue points overlayed by a line 
+plot(texec, N, type="o", col="blue") #plota o gráfico
+
+# Create a title with a red, bold/italic font
+title(main="texecXn", col.main="black", font.main=4)
+
+
+
+Página para compilar códigos R online:
+https://rextester.com/l/r_online_compiler
+
+Conclusões:
+Quanto maior é o valor n, a tendência é que o procedimento demore
+mais para ser executado a medida que mais iterações são realizadas
+a depender de n. #ajustar resposta após 3.4 ser finalizada

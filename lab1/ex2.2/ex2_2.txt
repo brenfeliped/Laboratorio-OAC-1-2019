@@ -1,0 +1,10 @@
+﻿Exercicício 2.2
+
+
+Alterações feitas do arquivo original compilado por ‘riscv32 gcc 7.2.0’ e adaptando para ser executado no rars :
+* Definição nas configurações o rars para execução da MAIN antes de outras labels (), e para isso definimos ela como global com o comando ‘.globl main’.
+* Definição do ‘.data’ para carregar no memória o vetor de 10 posições , e as labels usadas ‘\t’ e ‘\n’.
+* Definição do ‘.text’ para execução do programa em seguida.
+* Movemos o conteúdo de a1 para a0 , cujo é será o valor de retorno.
+* Em seguida dividimos a função ‘call printf’ em outras duas , ‘call printNUM’ e ‘call printTAB’ , com suas respectivas labels , que irão mostrar na tela os números do vetor não ordenado e ordenado , com o espaçamento adequado entre os números.
+* E por último carregamos ‘\n’ numa label no ínicio do programa , e para usarmos , abrimos espaço na pilha para uma string , escrevemos na memória , pegamos então o endereço da string e jogamos em um registrador a0 , mostra ‘\n’ na tela , e desempilha o conteúdo da pilha  .

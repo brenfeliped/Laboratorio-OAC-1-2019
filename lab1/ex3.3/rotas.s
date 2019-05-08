@@ -9,6 +9,7 @@
 N: .word 6
 # Número de Casas/Clientes
 C: .space 160
+D: .space 1600
 # Espaço em bytes correspondente a 2 coordenadas x 20 casas (máx) x 4 bytes,
 .text
 M_SetEcall(exceptionHandling)	# Macro de SetEcall - n�o tem ainda na DE1-SoC
@@ -19,6 +20,9 @@ jal ra,SORTEIO
 la a0,N
 la a1,C
 jal ra, DESENHA
+la a0,N
+la a1,C
+jal ra,ROTAS
 li a7,10 # chamada de fim de programa 
 ecall
 
@@ -46,17 +50,17 @@ ExitFor:
   jr ra     
 
 DESENHA:
-  addi sp, sp, -4
+  addi sp, sp, -12
   sw a0, 0(sp) # salvando os valores de N(a0) e C(a1) na pilha
   sw a1, 4(sp)
+  sw ra  8(sp)
   jal PLOTFRAME #constroi o plano de fundo
   
   jal PLOTPOINT #desenha os v�rtices
-  jal PLOTLINES #desenha os arcos
   
-  addi sp, sp, 4 #limpa a pilha novamente
-  
-  jal FIM #encerra o programa
+  lw ra, 8(sp)
+  addi sp,sp,12
+  ret  #encerra o programa
   
   
 PLOTPOINT:
@@ -82,32 +86,6 @@ FORPLOTPOINT:
   bne zero, s0, FORPLOTPOINT #condicao de parada quando s0 for 0, ou seja, quando todos os vertices estiverem plotados
   ret #retorna ao chamador
 
-PLOTLINES:
-  lw s1, 4(sp) #recarregando posi�oes s1(C) e s0(N)
-  lw t1, 0(sp)
-  lw s0, 0(t1) #recarrega o tamanho do vetor
-  
-PLOTARCO:
-  lw a0,0(s1) #carregando parametros
-  lw a1,4(s1)
-  lw a2,8(s1)
-  lw a3,12(s1)
-  li a4, 0x0000 #cor do arco preto
-  li a5, 0 #frame 0
-  
-  jal BRESENHAM #chama o m�todo para desenhar arcos
-  
-  addi s1, s1, 8 #pr�ximas tuplas
-  addi s0, s0, -4
-  bge s0, zero, PLOTARCO #enquanto s0 >= 0 ent�o volta a plotar arcos
-  
-  la s1, C #recarregando posi�oes s1(C)
-  lw a0,0(s1) #pega a primeira tupla(x,y)=(a0,a1)
-  lw a1,4(s1)
-  
-  jal BRESENHAM #printa um arco do primero ate o ultimo vertice
-  
-  ret #retorna ao chamador
 
 PLOTFRAME:
   li a0,0xFF000000  # endereco inicial da Memoria VGA
@@ -118,6 +96,47 @@ PLOT:
   addi a0, a0, 4 #incrementa 4 ao endere�o
   bne a0,a1,PLOT #Se n�o for o �ltimo endere�o ent�o continua o loop
   ret #caso contr�rio retorna para o chamador
+  
+ROTAS: # a0=N a1=c[]
+  li s5,0 # contador i
+  mv tp,a1 # tp = C[]
+  lw a0, 0(a0)
+  addi sp,sp,-4
+  sw  ra,0(sp)
+  for1:  beq s5,a0,exitfor1
+    lw s1, 0(tp) # s1 = x1
+    lw s2, 4(tp) # s2 = y1
+    addi tp,tp,8 # posina tp no inicio da proxima coordenada(x,y)
+    addi sp,sp,-4
+    sw tp,0(sp)
+    addi s6,s5,1 # contador j = i+1
+    for2:  beq s6,a0,exitfor2
+      lw s3, 0(tp) # s3= x2
+      lw s4, 4(tp) # s4 = y2
+      addi sp,sp,-4
+      sw a0,0(sp)
+      mv a0,s1   # carregando paramentros para BRESENHAM
+      mv a1,s2
+      mv a2,s3
+      mv a3,s4
+      li a4,0x0000 # cor preta
+      li a5,0 # seleciona a frame 0
+      jal BRESENHAM
+      lw a0,0(sp)
+      addi sp,sp,4
+      addi s6,s6,1 # j++
+      addi tp,tp,8 # direciona para proxima coordenada (x,y)
+      j for2
+    exitfor2:
+      lw tp, 0(sp) # recupera tp
+      addi sp,sp,4
+      addi s5,s5,1 #  i++
+      j for1
+  exitfor1:
+    lw ra, 0(sp)
+    addi sp,sp,4
+    ret
+  
   
 FIM:
   li a7, 10 #encerra a execu��o do algoritmo

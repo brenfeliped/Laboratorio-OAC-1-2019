@@ -6,7 +6,7 @@
 #Ser� printado um grafo no BitmapDisplay com as Coordenadas em C
 ##############################
 .data
-N: .word 20
+N: .word 6
 # Número de Casas/Clientes
 C: .space 160
 # Espaço em bytes correspondente a 2 coordenadas x 20 casas (máx) x 4 bytes,

@@ -6,10 +6,11 @@
 #Ser� printado um grafo no BitmapDisplay com as Coordenadas em C
 ##############################
 .data
-N: .word 6
+N: .word 3
 # Número de Casas/Clientes
 C: .space 160
 D: .space 1600
+space: .string " "
 # Espaço em bytes correspondente a 2 coordenadas x 20 casas (máx) x 4 bytes,
 .text
 M_SetEcall(exceptionHandling)	# Macro de SetEcall - n�o tem ainda na DE1-SoC
@@ -23,6 +24,9 @@ jal ra, DESENHA
 la a0,N
 la a1,C
 jal ra,ROTAS
+la a0,N
+la a1,D
+jal ra,MATRIZ
 li a7,10 # chamada de fim de programa 
 ecall
 
@@ -102,8 +106,17 @@ ROTAS: # a0=N a1=c[]
   mv tp,a1 # tp = C[]
   lw a0, 0(a0)
   addi sp,sp,-4
+  la s7,D
   sw  ra,0(sp)
   for1:  beq s5,a0,exitfor1
+    # abaixo codigo da matriz
+    mul s8,s5,a0 # s8= i*N (inicio do calculo da  posicao da matriz)
+    add s8,s5,s8 # s8= j +(i*N)
+    slli s8,s8,2 # s8 = (j +(i*N))*4 (fim do calculo da posicao da matriz)
+    add s8,s8,s7 # s8 = *D[i][i]
+    fcvt.s.w ft0,zero  # ft0 = float(0)
+    fsw ft0, 0(s8) # carrega 0 na D[i][i], ou seja a distancia de  D[i][i] para D[i][i] = 0 
+    # fim codigo da matriz
     lw s1, 0(tp) # s1 = x1
     lw s2, 4(tp) # s2 = y1
     addi tp,tp,8 # posina tp no inicio da proxima coordenada(x,y)
@@ -113,6 +126,25 @@ ROTAS: # a0=N a1=c[]
     for2:  beq s6,a0,exitfor2
       lw s3, 0(tp) # s3= x2
       lw s4, 4(tp) # s4 = y2
+      # abaixo codigo da matriz
+      mul s8,s5,a0 # s8= i*N (inicio do calculo da  posicao da matriz)
+      add s8,s6,s8 # s8= j +(i*N)
+      slli s8,s8,2 # s8 = (j +(i*N))*4) (fim do calculo da posicao da matriz)
+      add s8,s8,s7 # s8 = *D[i][j]
+      sub s9,s3,s1 # s9 = x2-x1 (calculo distancia euclidiana)
+      mul s9,s9,s9 # s9 = (x2-x1)**2
+      sub s10,s4,s2 # s10 = y2 - y1
+      mul s10,s10,s10 # s10= (y2- y1)**2
+      add s11,s9,s10 # s10 = (x2-x1)**2 + (y2- y1)**2
+      fcvt.s.w ft0,s11 # ft0 = float(s10)
+      fsqrt.s fa0,ft0 #  ft0 = sqrt((x2-x1)**2 + (y2- y1)**2)
+      fsw fa0,0(s8)
+      mul s8,s6,a0 # s8= j*N (inicio do calculo da  posicao da matriz)
+      add s8,s5,s8 # s8= i +(j*N)
+      slli s8,s8,2 # s8 = (j +(i*N))*4) (fim do calculo da posicao da matriz)
+      add s8,s8,s7 # s8 = *D[i][j]
+      fsw fa0, 0(s8)
+      # fim codigo da matriz
       addi sp,sp,-4
       sw a0,0(sp)
       mv a0,s1   # carregando paramentros para BRESENHAM
@@ -136,8 +168,26 @@ ROTAS: # a0=N a1=c[]
     lw ra, 0(sp)
     addi sp,sp,4
     ret
-  
-  
+MATRIZ: # a0=N e a1=D
+  lw a0,0(a0)
+  mul a0,a0,a0 # a0 = N*N
+  li t0,0
+  forM: beq t0,a0,exitforM
+    flw fa0,0(a1)
+    li a7,2
+    ecall
+    addi sp,sp,-4
+    sw a0,0(sp)
+    la a0,space
+    li a7,4
+    ecall
+    lw a0,0(sp)
+    addi sp,sp,4
+    addi a1,a1,4
+    addi t0,t0,1
+    j forM
+  exitforM:
+    ret
 FIM:
   li a7, 10 #encerra a execu��o do algoritmo
   M_Ecall

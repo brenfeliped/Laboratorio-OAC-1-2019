@@ -12,3 +12,9 @@
 - Identação com 2 espaços sem tabs
 - Comentar linha a linha subrotinas(métodos/procedimentos) realizadas
 - Arquivos dos códigos em assembly RISCV devem ser salvos na extensão .s
+
+### Padrões de commits
+- Identificar o Laboratório "Labx:...."
+- Identificar o Exercício "LabXExY:...."
+- Idetificar a alteração
+- Exemplo: "Lab1Ex3.2:função desenha adicionada"
